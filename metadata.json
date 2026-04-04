@@ -1,0 +1,5 @@
+{
+  "name": "Synthly",
+  "description": "A production-ready AI text utility for summarizing, extracting action items, and rewriting text with real-time streaming and source highlights.",
+  "requestFramePermissions": []
+}
