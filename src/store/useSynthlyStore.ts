@@ -28,6 +28,11 @@ interface SynthlyState {
   sourceHighlights: string[];
   setSourceHighlights: (highlights: string[]) => void;
 
+  // Chunk Progress
+  currentChunk: number;
+  totalChunks: number;
+  setChunkProgress: (current: number, total: number) => void;
+
   // History
   history: HistoryEntry[];
   addToHistory: (entry: HistoryEntry) => void;
@@ -43,6 +48,8 @@ interface SynthlyState {
   togglePrivacyMode: () => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  isCompareMode: boolean;
+  toggleCompareMode: () => void;
 
   // Error
   error: string | null;
@@ -67,11 +74,15 @@ export const useSynthlyStore = create<SynthlyState>()(
       outputText: '',
       setOutputText: (text) => set({ outputText: text }),
       appendOutputText: (chunk) => set((state) => ({ outputText: state.outputText + chunk })),
-      clearOutput: () => set({ outputText: '', sourceHighlights: [] }),
+      clearOutput: () => set({ outputText: '', sourceHighlights: [], currentChunk: 0, totalChunks: 0 }),
       isStreaming: false,
       setIsStreaming: (val) => set({ isStreaming: val }),
       sourceHighlights: [],
       setSourceHighlights: (highlights) => set({ sourceHighlights: highlights }),
+
+      currentChunk: 0,
+      totalChunks: 0,
+      setChunkProgress: (current, total) => set({ currentChunk: current, totalChunks: total }),
 
       history: [],
       addToHistory: (entry) => set((state) => ({ 
@@ -90,6 +101,8 @@ export const useSynthlyStore = create<SynthlyState>()(
       togglePrivacyMode: () => set((state) => ({ privacyMode: !state.privacyMode })),
       theme: 'light',
       toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+      isCompareMode: false,
+      toggleCompareMode: () => set((state) => ({ isCompareMode: !state.isCompareMode })),
 
       error: null,
       setError: (msg) => set({ error: msg }),

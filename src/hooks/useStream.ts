@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { ProcessRequest } from '../types';
 import { getPrompt } from '../lib/prompts';
 import { chunkText } from '../lib/utils';
+import { useSynthlyStore } from '../store/useSynthlyStore';
 
 interface UseStreamOptions {
   onChunk: (chunk: string) => void;
@@ -15,6 +16,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 export function useStream(options: UseStreamOptions) {
   const [isStreaming, setIsStreaming] = useState(false);
   const abortControllerRef = useRef<boolean>(false);
+  const setChunkProgress = useSynthlyStore((state) => state.setChunkProgress);
 
   const startStream = useCallback(async (body: ProcessRequest) => {
     setIsStreaming(true);
@@ -23,6 +25,10 @@ export function useStream(options: UseStreamOptions) {
     try {
       const chunks = await chunkText(body.text);
       let fullMergedResult = '';
+      const totalSteps = chunks.length + (chunks.length > 1 && body.action === 'summarize' ? 1 : 0);
+      let currentStep = 0;
+
+      setChunkProgress(0, totalSteps);
 
       if (chunks.length > 1) {
         options.onChunk(`*Processing text in ${chunks.length} sections...*\n\n---\n\n`);
@@ -31,10 +37,16 @@ export function useStream(options: UseStreamOptions) {
       for (let i = 0; i < chunks.length; i++) {
         if (abortControllerRef.current) break;
 
+        currentStep++;
+        setChunkProgress(currentStep, totalSteps);
+
         const chunkPrompt = getPrompt({ ...body, text: chunks[i] });
-        
-        const response = await ai.models.generateContentStream({
-          model: "gemini-1.5-flash",
+...
+        if (chunks.length > 1 && body.action === 'summarize') {
+          currentStep++;
+          setChunkProgress(currentStep, totalSteps);
+
+          options.onChunk('\n\n---\n\n*Generating final summary...*\n\n');
           contents: chunkPrompt,
         });
 
