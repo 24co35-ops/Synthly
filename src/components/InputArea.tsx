@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Lock, AlertTriangle, X, Info } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Lock, AlertTriangle, X, Info, FileText } from 'lucide-react';
 import { useSynthlyStore } from '../store/useSynthlyStore';
 import { detectPII } from '../lib/piiDetector';
 import { getWordCount, cn } from '../lib/utils';
@@ -8,6 +8,8 @@ export const InputArea: React.FC = () => {
   const { inputText, setInputText, clearInput, privacyMode, error } = useSynthlyStore();
   const [piiInfo, setPiiInfo] = useState<{ hasPII: boolean; types: string[] }>({ hasPII: false, types: [] });
   const [showPiiBanner, setShowPiiBanner] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const wordCount = getWordCount(inputText);
   const charCount = inputText.length;
@@ -26,9 +28,42 @@ export const InputArea: React.FC = () => {
     return () => clearTimeout(timer);
   }, [inputText, privacyMode]);
 
+  const handleFile = (file: File) => {
+    if (file.type === 'text/plain' || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        if (content) setInputText(content);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const onDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const onDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }, []);
+
   return (
     <div className="space-y-4">
-      <div className="relative">
+      <div 
+        className="relative"
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+      >
         <textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
@@ -36,12 +71,23 @@ export const InputArea: React.FC = () => {
           className={cn(
             "w-full min-h-[200px] p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] text-[var(--font-size-body)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 resize-y transition-all",
             privacyMode && "border-2 border-teal-200",
+            isDragging && "border-2 border-dashed border-[var(--color-primary)] bg-blue-50/50 dark:bg-blue-900/10",
             error === 'empty-input' && "animate-shake"
           )}
           aria-label="Input text"
           aria-describedby="word-count-info"
         />
-        {privacyMode && (
+        
+        {isDragging && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="flex flex-col items-center gap-2 text-[var(--color-primary)]">
+              <FileText className="w-8 h-8 animate-bounce" />
+              <span className="font-bold">Drop text or markdown file</span>
+            </div>
+          </div>
+        )}
+
+        {privacyMode && !isDragging && (
           <div className="absolute bottom-4 right-4">
             <Lock className="w-3 h-3 text-teal-500" />
           </div>

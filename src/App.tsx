@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Zap, X } from 'lucide-react';
+import { nanoid } from 'nanoid';
 import { Navbar } from './components/Navbar';
 import { InputArea } from './components/InputArea';
 import { ActionBar } from './components/ActionBar';
@@ -29,6 +30,7 @@ export default function App() {
     setSourceHighlights,
     setError,
     privacyMode,
+    addToHistory,
   } = useSynthlyStore();
 
   const onChunk = useCallback((chunk: string) => {
@@ -39,7 +41,22 @@ export default function App() {
     setIsStreaming(false);
     const highlights = extractHighlights(inputText, fullText);
     setSourceHighlights(highlights);
-  }, [inputText, setIsStreaming, setSourceHighlights]);
+
+    // Auto-save to history
+    if (selectedAction) {
+      addToHistory({
+        id: nanoid(),
+        action: selectedAction,
+        tone: selectedTone,
+        length: outputLength,
+        inputPreview: inputText.slice(0, 80),
+        fullInput: inputText,
+        output: fullText,
+        highlights: highlights,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [inputText, setIsStreaming, setSourceHighlights, selectedAction, selectedTone, outputLength, addToHistory]);
 
   const onError = useCallback((message: string) => {
     setIsStreaming(false);
@@ -72,6 +89,21 @@ export default function App() {
       length: outputLength,
     });
   }, [inputText, selectedAction, selectedTone, outputLength, clearOutput, setError, setIsStreaming, startStream]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isStreaming) handleRun();
+      }
+      if (e.key === 'Escape') {
+        if (isStreaming) cancelStream();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleRun, isStreaming, cancelStream]);
 
   React.useEffect(() => {
     const handleRegenerate = () => handleRun();

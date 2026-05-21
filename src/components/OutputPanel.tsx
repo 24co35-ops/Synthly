@@ -46,7 +46,7 @@ export const OutputPanel: React.FC = () => {
             {sourceHighlights.map((highlight, i) => (
               <span
                 key={i}
-                className="px-2 py-0.5 bg-[var(--color-highlight)] text-[#92400E] dark:text-amber-200 text-sm font-medium rounded-md max-w-[300px] overflow-hidden text-overflow-ellipsis whitespace-nowrap"
+                className="px-2 py-0.5 bg-[var(--color-highlight)] text-[#92400E] dark:text-amber-200 text-sm font-medium rounded-md max-w-full"
                 title={highlight}
               >
                 "{highlight}"
