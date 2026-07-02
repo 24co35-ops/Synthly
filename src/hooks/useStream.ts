@@ -43,7 +43,7 @@ export function useStream(options: UseStreamOptions) {
         const chunkPrompt = getPrompt({ ...body, text: chunks[i] });
 
         const response = await ai.models.generateContentStream({
-          model: "gemini-1.5-flash",
+          model: "gemini-2.5-flash",
           contents: chunkPrompt,
         });
 
@@ -74,7 +74,7 @@ export function useStream(options: UseStreamOptions) {
           const finalPrompt = `Summarize the following section-by-section summaries into one cohesive final summary. Maintain the requested ${body.length} depth.\n\nSummaries:\n${fullMergedResult}`;
           
           const finalResponse = await ai.models.generateContentStream({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.5-flash",
             contents: finalPrompt,
           });
 
