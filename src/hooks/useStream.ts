@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { ProcessRequest } from '../types';
 import { getPrompt } from '../lib/prompts';
 import { chunkText } from '../lib/utils';
@@ -11,7 +10,54 @@ interface UseStreamOptions {
   onError: (error: string) => void;
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+async function streamFromServer(
+  prompt: string,
+  onChunk: (text: string) => void,
+  abortRef: { current: boolean }
+): Promise<string> {
+  const res = await fetch('/api/stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+  });
+
+  if (!res.ok || !res.body) {
+    const err = await res.json().catch(() => ({ error: 'stream failed' }));
+    throw new Error(err.error || 'stream failed');
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let result = '';
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done || abortRef.current) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const payload = line.slice(6).trim();
+      if (payload === '[DONE]') return result;
+      try {
+        const parsed = JSON.parse(payload);
+        if (parsed.error) throw new Error(parsed.error);
+        if (parsed.text) {
+          result += parsed.text;
+          onChunk(parsed.text);
+        }
+      } catch (e: any) {
+        throw new Error(e.message || 'parse error');
+      }
+    }
+  }
+
+  return result;
+}
 
 export function useStream(options: UseStreamOptions) {
   const [isStreaming, setIsStreaming] = useState(false);
@@ -41,50 +87,21 @@ export function useStream(options: UseStreamOptions) {
         setChunkProgress(currentStep, totalSteps);
 
         const chunkPrompt = getPrompt({ ...body, text: chunks[i] });
-
-        const response = await ai.models.generateContentStream({
-          model: "gemini-2.5-flash",
-          contents: chunkPrompt,
-        });
-
-        let chunkResult = '';
-        for await (const chunk of response) {
-          if (abortControllerRef.current) break;
-          const text = chunk.text || "";
-          chunkResult += text;
-          options.onChunk(text);
-        }
+        const chunkResult = await streamFromServer(chunkPrompt, options.onChunk, abortControllerRef);
 
         fullMergedResult += chunkResult + '\n\n';
-        
+
         if (i < chunks.length - 1 && !abortControllerRef.current) {
           options.onChunk('\n\n---\n\n');
         }
       }
 
       if (!abortControllerRef.current) {
-        // If we have multiple chunks and it's a summary, we might want to do a final summary
-        // But for MVP, simple concatenation with separators is often enough and saves tokens.
-        // The PRD mentions "merged hierarchically", which implies a final pass.
-        // Let's implement a simple hierarchical merge for 'summarize' only if there were multiple chunks.
-        
         if (chunks.length > 1 && body.action === 'summarize') {
           options.onChunk('\n\n---\n\n*Generating final summary...*\n\n');
-          
-          const finalPrompt = `Summarize the following section-by-section summaries into one cohesive final summary. Maintain the requested ${body.length} depth.\n\nSummaries:\n${fullMergedResult}`;
-          
-          const finalResponse = await ai.models.generateContentStream({
-            model: "gemini-2.5-flash",
-            contents: finalPrompt,
-          });
 
-          let finalResult = '';
-          for await (const chunk of finalResponse) {
-            if (abortControllerRef.current) break;
-            const text = chunk.text || "";
-            finalResult += text;
-            options.onChunk(text);
-          }
+          const finalPrompt = `Summarize the following section-by-section summaries into one cohesive final summary. Maintain the requested ${body.length} depth.\n\nSummaries:\n${fullMergedResult}`;
+          const finalResult = await streamFromServer(finalPrompt, options.onChunk, abortControllerRef);
           fullMergedResult = finalResult;
         }
 
