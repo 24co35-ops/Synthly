@@ -30,10 +30,11 @@ export const ActionBar: React.FC = () => {
           const isSelected = selectedAction === action.id;
           return (
             <button
+              id={`action-${action.id}`}
               key={action.id}
               onClick={() => setSelectedAction(action.id)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 h-[40px] rounded-lg border text-[13px] font-medium tracking-wider transition-all",
+                "flex-1 flex items-center justify-center gap-2 h-[40px] rounded-lg border text-[13px] font-medium tracking-wider transition-all duration-300",
                 isSelected
                   ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
                   : "bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-blue-50 dark:hover:bg-blue-900/20"
@@ -51,10 +52,11 @@ export const ActionBar: React.FC = () => {
         <div className="flex justify-center gap-2 overflow-hidden animate-slide-up">
           {TONES.map((tone) => (
             <button
+              id={`tone-${tone.id}`}
               key={tone.id}
               onClick={() => setSelectedTone(tone.id)}
               className={cn(
-                "px-4 py-1.5 h-[28px] rounded-full border text-[13px] transition-all",
+                "px-4 py-1.5 h-[28px] rounded-full border text-[13px] transition-all duration-300",
                 selectedTone === tone.id
                   ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
                   : "bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]"

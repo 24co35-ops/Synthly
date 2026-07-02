@@ -21,9 +21,10 @@ export const LengthSelector: React.FC = () => {
         {LENGTHS.map((len, index) => (
           <React.Fragment key={len.id}>
             <button
+              id={`length-${len.id}`}
               onClick={() => setOutputLength(len.id)}
               className={cn(
-                "flex-1 h-[36px] text-[13px] transition-all",
+                "flex-1 h-[36px] text-[13px] transition-all duration-300",
                 outputLength === len.id
                   ? "bg-[var(--color-primary)] text-white"
                   : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-gray-50 dark:hover:bg-gray-800"

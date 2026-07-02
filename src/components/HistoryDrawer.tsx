@@ -77,8 +77,9 @@ export const HistoryDrawer: React.FC = () => {
         {history.length > 0 && (
           <div className="p-6 border-t border-[var(--color-border)]">
             <button
+              id="clear-history-btn"
               onClick={clearHistory}
-              className="w-full py-2.5 text-gray-500 hover:text-red-500 text-[14px] font-medium transition-colors"
+              className="w-full py-2.5 text-gray-500 hover:text-red-500 text-[14px] font-medium transition-colors duration-300"
             >
               Clear All History
             </button>

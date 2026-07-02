@@ -133,10 +133,11 @@ export default function App() {
         
         <div className="mt-8 text-right">
           <button
+            id="run-btn"
             onClick={isStreaming ? cancelStream : handleRun}
             disabled={!inputText.trim() || !selectedAction}
             className={cn(
-              "w-full h-[48px] rounded-[var(--radius-lg)] flex items-center justify-center gap-2 text-white font-bold transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed",
+              "w-full h-[48px] rounded-[var(--radius-lg)] flex items-center justify-center gap-2 text-white font-bold transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed",
               isStreaming ? "bg-red-500 hover:bg-red-600" : "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]"
             )}
           >

@@ -41,12 +41,9 @@ export function useStream(options: UseStreamOptions) {
         setChunkProgress(currentStep, totalSteps);
 
         const chunkPrompt = getPrompt({ ...body, text: chunks[i] });
-...
-        if (chunks.length > 1 && body.action === 'summarize') {
-          currentStep++;
-          setChunkProgress(currentStep, totalSteps);
 
-          options.onChunk('\n\n---\n\n*Generating final summary...*\n\n');
+        const response = await ai.models.generateContentStream({
+          model: "gemini-1.5-flash",
           contents: chunkPrompt,
         });
 

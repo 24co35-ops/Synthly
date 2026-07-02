@@ -62,9 +62,10 @@ export const OutputPanel: React.FC = () => {
             </div>
             {selectedAction === 'rewrite-tone' && outputText && (
               <button
+                id="compare-btn"
                 onClick={toggleCompareMode}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-medium transition-all",
+                  "flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-300",
                   isCompareMode 
                     ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" 
                     : "hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--color-text-secondary)]"
@@ -106,10 +107,13 @@ export const OutputPanel: React.FC = () => {
             </div>
           )}
 
-          <div className={cn(
-            "markdown-body text-[var(--font-size-output)] leading-[1.7] text-[var(--color-text-primary)]",
-            selectedAction === 'action-items' && "action-items-list"
-          )}>
+          <div 
+            aria-live="polite"
+            className={cn(
+              "markdown-body text-[var(--font-size-output)] leading-[1.7] text-[var(--color-text-primary)] transition-all duration-300",
+              selectedAction === 'action-items' && "action-items-list"
+            )}
+          >
             <Markdown 
               remarkPlugins={[remarkGfm]}
               components={{

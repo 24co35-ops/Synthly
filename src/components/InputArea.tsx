@@ -65,11 +65,12 @@ export const InputArea: React.FC = () => {
         onDrop={onDrop}
       >
         <textarea
+          id="input-textarea"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Paste your text here — an article, note, email, meeting transcript, or any content you want to process."
           className={cn(
-            "w-full min-h-[200px] p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] text-[var(--font-size-body)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 resize-y transition-all",
+            "w-full min-h-[200px] p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] text-[var(--font-size-body)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 resize-y transition-all duration-300",
             privacyMode && "border-2 border-teal-200",
             isDragging && "border-2 border-dashed border-[var(--color-primary)] bg-blue-50/50 dark:bg-blue-900/10",
             error === 'empty-input' && "animate-shake"
@@ -128,8 +129,9 @@ export const InputArea: React.FC = () => {
         </div>
         {inputText && (
           <button
+            id="clear-input-btn"
             onClick={clearInput}
-            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-[13px] font-medium transition-colors"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-[13px] font-medium transition-colors duration-300"
           >
             Clear
           </button>

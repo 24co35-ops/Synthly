@@ -51,9 +51,10 @@ export const OutputControls: React.FC = () => {
   return (
     <div className="flex gap-2 mt-4">
       <button
+        id="copy-btn"
         onClick={handleCopy}
         disabled={isStreaming}
-        className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all"
+        className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all duration-300"
       >
         {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
         {copied ? 'Copied' : 'Copy'}
@@ -61,31 +62,34 @@ export const OutputControls: React.FC = () => {
 
       <div className="relative group">
         <button
+          id="download-btn"
           disabled={isStreaming}
-          className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all"
+          className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all duration-300"
         >
           <Download className="w-4 h-4" />
           Download
         </button>
         <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-lg overflow-hidden z-10">
-          <button onClick={() => handleDownload('txt')} className="w-full px-4 py-2 text-left text-[13px] hover:bg-gray-50 dark:hover:bg-gray-800">.txt</button>
-          <button onClick={() => handleDownload('md')} className="w-full px-4 py-2 text-left text-[13px] hover:bg-gray-50 dark:hover:bg-gray-800">.md</button>
+          <button id="download-txt-btn" onClick={() => handleDownload('txt')} className="w-full px-4 py-2 text-left text-[13px] hover:bg-gray-50 dark:hover:bg-gray-800">.txt</button>
+          <button id="download-md-btn" onClick={() => handleDownload('md')} className="w-full px-4 py-2 text-left text-[13px] hover:bg-gray-50 dark:hover:bg-gray-800">.md</button>
         </div>
       </div>
 
       <button
+        id="save-btn"
         onClick={handleSave}
         disabled={isStreaming || isAlreadySaved}
-        className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all"
+        className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all duration-300"
       >
         <Bookmark className={isAlreadySaved ? "w-4 h-4 fill-current text-[var(--color-primary)]" : "w-4 h-4"} />
         {saved ? 'Saved' : isAlreadySaved ? 'Saved' : 'Save'}
       </button>
 
       <button
+        id="regenerate-btn"
         onClick={handleRegenerate}
         disabled={isStreaming}
-        className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all"
+        className="flex items-center gap-1.5 px-3 h-[36px] border border-[var(--color-border)] rounded-lg text-[13px] font-medium hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all duration-300"
       >
         <RefreshCw className="w-4 h-4" />
         Regenerate
