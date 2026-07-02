@@ -15,7 +15,7 @@ async function streamFromServer(
   onChunk: (text: string) => void,
   abortRef: { current: boolean }
 ): Promise<string> {
-  const res = await fetch('/api/stream', {
+  const res = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),

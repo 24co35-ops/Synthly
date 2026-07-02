@@ -19,7 +19,7 @@ async function startServer() {
   app.use(express.json());
 
   // Server-side Gemini streaming proxy — keeps API key off the client
-  app.post("/api/stream", async (req, res) => {
+  app.post("/api/generate", async (req, res) => {
     const { prompt, isFinal } = req.body as { prompt: string; isFinal?: boolean };
 
     if (!prompt) {

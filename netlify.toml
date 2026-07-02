@@ -1,3 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  edge_functions = "netlify/edge-functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
